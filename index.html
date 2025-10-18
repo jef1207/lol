@@ -6,115 +6,286 @@
   <title>MyGame</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      background: #0a1931;
       color: white;
       min-height: 100vh;
+      position: relative;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ffcc00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .balance {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+      background: #1e3a5f;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+    .filter-container {
+      padding: 20px 20px 10px;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filter-btn {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .game-card {
+      background: #1e3a5f;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 10px 20px;
+      position: relative;
+    }
+    .game-image {
+      width: 100%;
+      height: 200px;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #ddd;
+    }
+    .game-info {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .game-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .play-btn {
+      background: #ffcc00;
+      color: #000;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .section {
+      padding: 20px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .games-grid {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 0;
+      scrollbar-width: none;
+    }
+    .game-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       text-align: center;
-      padding: 20px;
-      overflow: hidden;
+      min-width: 100px;
     }
-    .logo {
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      letter-spacing: -0.8px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    .game-icon {
+      width: 80px;
+      height: 80px;
+      background: #333;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 5px;
     }
-    .subtitle {
-      font-size: 16px;
-      opacity: 0.95;
-      margin-bottom: 28px;
-      line-height: 1.5;
-      max-width: 280px;
+    .game-name {
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 5px;
     }
-    .btn {
-      background: white;
-      color: #2575fc;
-      border: none;
-      border-radius: 50px;
-      padding: 16px 0;
-      font-size: 18px;
-      font-weight: 700;
-      width: 100%;
-      max-width: 240px;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
-    .community {
-      font-size: 14px;
-      opacity: 0.85;
-      margin-top: 24px;
-    }
-    .community a {
-      color: white;
-      text-decoration: underline;
-      font-weight: 600;
-    }
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #ffcc00;
-      border-radius: 50%;
-      animation: fall 5s linear infinite;
+    .game-category {
+      font-size: 10px;
       opacity: 0.7;
     }
-    @keyframes fall {
-      to { transform: translateY(100vh) rotate(360deg); }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: #0d2a4c;
+      padding: 10px 0;
+    }
+    .footer-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .footer-icon {
+      font-size: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="logo">MyGame</div>
-  <div class="subtitle">
-    The biggest gaming platform on Telegram!<br>
-    Join the community<br>
-    <a href="https://t.me/mygamechannel" target="_blank">@mygamechannel</a><br>
-    Perks, giveaways, airdrops & more
+  <!-- Верхняя панель -->
+  <div class="header">
+    <button style="background:none; border:none; color:white; font-size:16px;">×</button>
+    <span>MyGame</span>
+    <div style="display:flex; gap:10px;">
+      <div class="balance">🎯 Очки: 1234</div>
+      <div class="balance">🎫 Билеты: 725</div>
+    </div>
   </div>
-  <button class="btn" id="playBtn">Play Now</button>
-  <div class="community">
-    Follow updates at<br>
-    <a href="https://t.me/mygamechannel" target="_blank">@mygamechannel</a>
+
+  <!-- Фильтры -->
+  <div class="filter-container">
+    <button class="filter-btn">🎮 ARCADE</button>
+    <button class="filter-btn">🌀 PUZZLE</button>
+    <button class="filter-btn">🏀 SPORT</button>
+    <button class="filter-btn">🥊 ACTION</button>
+  </div>
+
+  <!-- Карточка игры -->
+  <div class="game-card">
+    <div class="game-image">KARATE KIDO</div>
+    <div class="game-info">
+      <div>
+        <div class="game-title">Karate Kido</div>
+      </div>
+      <button class="play-btn">ИГРАТЬ</button>
+    </div>
+  </div>
+
+  <!-- Continue playing -->
+  <div class="section">
+    <div class="section-title">
+      <span>Continue playing</span>
+      <span style="font-size:14px; opacity:0.7;">View all</span>
+    </div>
+    <div class="games-grid">
+      <div class="game-item">
+        <div class="game-icon">🏍️</div>
+        <div class="game-name">MotoFX</div>
+        <div class="game-category">Sport</div>
+      </div>
+      <div class="game-item">
+        <div class="game-icon">🏎️</div>
+        <div class="game-name">Ride or Die</div>
+        <div class="game-category">Action</div>
+      </div>
+      <div class="game-item">
+        <div class="game-icon">🏎️</div>
+        <div class="game-name">F1 Racer</div>
+        <div class="game-category">Sport</div>
+      </div>
+      <div class="game-item">
+        <div class="game-icon">🃏</div>
+        <div class="game-name">Wizard's 21</div>
+        <div class="game-category">Puzzle</div>
+      </div>
+      <div class="game-item">
+        <div class="game-icon">🚀</div>
+        <div class="game-name">Skipper</div>
+        <div class="game-category">Quick</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trending games -->
+  <div class="section">
+    <div class="section-title">
+      <span>Trending games</span>
+      <span style="font-size:14px; opacity:0.7;">View all</span>
+    </div>
+    <div class="games-grid">
+      <div class="game-item">
+        <div class="game-icon">🥋</div>
+        <div class="game-name">Karate Kido</div>
+        <div class="game-category">Arcade</div>
+      </div>
+      <div class="game-item">
+        <div class="game-icon">🕹️</div>
+        <div class="game-name">Space Rush</div>
+        <div class="game-category">Action</div>
+      </div>
+      <div class="game-item">
+        <div class="game-icon">🧩</div>
+        <div class="game-name">Block Drop</div>
+        <div class="game-category">Puzzle</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Нижняя панель -->
+  <div class="footer">
+    <div class="footer-btn"><div class="footer-icon">👥</div>Сообщество</div>
+    <div class="footer-btn"><div class="footer-icon">🎡</div>Колесо</div>
+    <div class="footer-btn"><div class="footer-icon">🎮</div>Играть</div>
+    <div class="footer-btn"><div class="footer-icon">🚀</div>Ракета</div>
+    <div class="footer-btn"><div class="footer-icon">💰</div>Призы</div>
   </div>
 
   <script>
-    // Добавим немного анимации (конфетти)
-    for (let i = 0; i < 15; i++) {
-      const confetti = document.createElement('div');
-      confetti.className = 'confetti';
-      confetti.style.left = Math.random() * 100 + 'vw';
-      confetti.style.animationDelay = Math.random() * 5 + 's';
-      confetti.style.backgroundColor = ['#ffcc00', '#ff6b6b', '#4ecdc4', '#45b7d1'][Math.floor(Math.random() * 4)];
-      document.body.appendChild(confetti);
-    }
-
-    // Telegram WebApp
+    // Telegram WebApp initialization
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
     }
 
-    document.getElementById('playBtn').addEventListener('click', () => {
-      if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-        Telegram.WebApp.showAlert('🎮 Игра скоро будет доступна!');
-      }
+    // Обработчики кликов
+    document.querySelectorAll('.play-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        alert('Игра запущена!');
+      });
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        alert('Фильтр: ' + btn.textContent);
+      });
+    });
+
+    document.querySelectorAll('.footer-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        alert('Переход в раздел: ' + btn.textContent.trim());
+      });
     });
   </script>
 </body>
