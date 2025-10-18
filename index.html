@@ -1,155 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MyGame</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f0f7ff;
+      background: #f5f7ff;
       color: #333;
       min-height: 100vh;
-      padding: 20px;
-    }
-    #menu, #game {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      min-height: 100vh;
+      padding: 20px;
     }
-    #game { display: none; }
-
-    /* Стиль меню — как у GAMEE */
-    .menu-bg {
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-      color: white;
-      width: 100%;
-      padding: 40px 20px;
-      border-radius: 20px;
+    .header {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
     }
-    .logo { font-size: 28px; font-weight: 800; margin-bottom: 16px; }
-    .text { font-size: 14px; line-height: 1.5; opacity: 0.95; margin-bottom: 24px; }
+    .tagline {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
     .btn {
-      background: white;
-      color: #2575fc;
+      background: #4CAF50;
+      color: white;
       border: none;
       border-radius: 50px;
-      padding: 14px 0;
+      padding: 14px 30px;
       font-size: 17px;
       font-weight: 600;
-      width: 100%;
-      max-width: 220px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
     }
-    .community {
-      font-size: 13px;
-      opacity: 0.85;
-      margin-top: 24px;
-    }
-    .community a { color: white; text-decoration: underline; }
-
-    /* Стиль игры */
-    #score {
-      font-size: 36px;
-      margin: 20px;
-      color: #e91e63;
-    }
-    #tapBtn {
-      padding: 15px 30px;
-      font-size: 18px;
-      background: #e91e63;
-      color: white;
-      border: none;
-      border-radius: 10px;
-    }
-    #backBtn {
+    .footer {
+      font-size: 12px;
+      opacity: 0.7;
       margin-top: 20px;
-      background: #6a11cb;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <!-- Главное меню -->
-  <div id="menu">
-    <div class="menu-bg">
-      <div class="logo">MyGame</div>
-      <div class="text">
-        The biggest gaming platform on Telegram!<br>
-        Join the community<br>
-        @mygamechannel<br>
-        Perks, giveaways, airdrops & more
-      </div>
-      <button class="btn" id="playBtn">Play Now</button>
-      <div class="community">
-        Follow updates at<br>
-        <a href="https://t.me/mygamechannel" target="_blank">@mygamechannel</a>
-      </div>
+  <div class="container">
+    <div class="header">MyGame</div>
+    <div class="tagline">
+      The biggest gaming platform on Telegram!<br>
+      Join the community @mygamechannel<br>
+      Perks, giveaways, airdrops & more
     </div>
-  </div>
-
-  <!-- Игра -->
-  <div id="game">
-    <h2>Tap Game 🕹️</h2>
-    <p>Тапай, чтобы заработать очки!</p>
-    <div id="score">0</div>
-    <button id="tapBtn">TAP!</button>
-    <br>
-    <button id="backBtn">← Назад</button>
+    <button class="btn" id="playBtn">Play Now</button>
+    <div class="footer">© 2025 MyGame — All rights reserved</div>
   </div>
 
   <script>
-    // Инициализация Telegram
-    if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+    // Обязательная инициализация Telegram WebApp
+    if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
-    }
 
-    // Состояние
-    let score = 0;
-
-    // Элементы
-    const menu = document.getElementById('menu');
-    const game = document.getElementById('game');
-    const scoreEl = document.getElementById('score');
-
-    // Кнопка Play Now
-    document.getElementById('playBtn').addEventListener('click', () => {
-      menu.style.display = 'none';
-      game.style.display = 'flex';
-    });
-
-    // Кнопка Назад
-    document.getElementById('backBtn').addEventListener('click', () => {
-      menu.style.display = 'flex';
-      game.style.display = 'none';
-    });
-
-    // Тап
-    document.getElementById('tapBtn').addEventListener('click', () => {
-      score++;
-      scoreEl.textContent = score;
-    });
-
-    // Отправка результата (показываем кнопку Telegram)
-    if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+      // Настройка кнопки "Отправить результат"
       Telegram.WebApp.MainButton.setText('Отправить результат').hide();
-      document.getElementById('tapBtn').addEventListener('click', () => {
+      document.getElementById('playBtn').addEventListener('click', () => {
+        // Здесь можно начать игру или переключиться на другой экран
+        Telegram.WebApp.showAlert('🎮 Игра скоро будет доступна!');
         Telegram.WebApp.MainButton.show();
       });
+
+      // Обработчик нажатия на MainButton
       Telegram.WebApp.MainButton.onClick(() => {
-        Telegram.WebApp.sendData(JSON.stringify({ score }));
+        const data = { score: Math.floor(Math.random() * 100) }; // Пример данных
+        Telegram.WebApp.sendData(JSON.stringify(data));
         Telegram.WebApp.close();
+      });
+    } else {
+      // Для отладки в браузере
+      document.getElementById('playBtn').addEventListener('click', () => {
+        alert('Игра запущена в браузере!');
       });
     }
   </script>
