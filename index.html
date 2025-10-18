@@ -13,7 +13,14 @@
       color: white;
       min-height: 100vh;
       position: relative;
+      padding-bottom: 70px;
+      overflow-x: hidden;
     }
+
+    /* Основной интерфейс */
+    .main-screen { display: block; }
+    .game-screen { display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: #112240; padding: 20px; position: relative; }
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -23,15 +30,15 @@
       top: 0;
       z-index: 100;
     }
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #ffcc00;
+    .profile-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 20px;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
     }
     .balance {
       display: flex;
@@ -73,7 +80,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 28px;
       color: #ddd;
     }
     .game-info {
@@ -161,131 +168,306 @@
     .footer-icon {
       font-size: 24px;
     }
+
+    /* Игровой экран */
+    .arena {
+      width: 90%;
+      height: 200px;
+      background: #223355;
+      border-radius: 10px;
+      position: relative;
+      margin: 20px 0;
+      overflow: hidden;
+      border: 2px solid #ffcc00;
+    }
+    .player, .enemy {
+      position: absolute;
+      bottom: 20px;
+      width: 50px;
+      height: 80px;
+      background: #445577;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .player { left: 50px; background: #3a5f1e; }
+    .enemy { right: 50px; background: #5f1e1e; }
+    .health-bar {
+      width: 100%;
+      height: 20px;
+      background: #333;
+      border-radius: 10px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    .health-fill {
+      height: 100%;
+      background: #ff3333;
+      transition: width 0.3s;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .control-btn {
+      width: 60px;
+      height: 60px;
+      background: #1e3a5f;
+      border: 2px solid #ffcc00;
+      border-radius: 10px;
+      color: white;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .attack-btn {
+      width: 80px;
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+    }
+    .result-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .result-screen h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .back-btn {
+      background: #ffcc00;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <!-- Верхняя панель -->
-  <div class="header">
-    <button style="background:none; border:none; color:white; font-size:16px;">×</button>
-    <span>MyGame</span>
-    <div style="display:flex; gap:10px;">
-      <div class="balance">🎯 Очки: 1234</div>
-      <div class="balance">🎫 Билеты: 725</div>
+  <!-- Основной экран -->
+  <div class="main-screen" id="mainScreen">
+    <div class="header">
+      <button class="profile-btn" id="profileBtn">👤 Личный кабинет</button>
+      <span>MyGame</span>
+      <div style="display:flex; gap:10px;">
+        <div class="balance">🎯 Очки: 1234</div>
+        <div class="balance">🎫 Билеты: 725</div>
+      </div>
     </div>
+
+    <div class="filter-container">
+      <button class="filter-btn">🎮 ARCADE</button>
+      <button class="filter-btn">🌀 PUZZLE</button>
+      <button class="filter-btn">🏀 SPORT</button>
+      <button class="filter-btn">🥊 ACTION</button>
+    </div>
+
+    <div class="game-card" id="karateCard">
+      <div class="game-image">🥋</div>
+      <div class="game-info">
+        <div><div class="game-title">Karate Kido</div></div>
+        <button class="play-btn">ИГРАТЬ</button>
+      </div>
+    </div>
+
+    <!-- Другие секции можно оставить, но для простоты скроем при запуске игры -->
   </div>
 
-  <!-- Фильтры -->
-  <div class="filter-container">
-    <button class="filter-btn">🎮 ARCADE</button>
-    <button class="filter-btn">🌀 PUZZLE</button>
-    <button class="filter-btn">🏀 SPORT</button>
-    <button class="filter-btn">🥊 ACTION</button>
-  </div>
+  <!-- Игровой экран -->
+  <div class="game-screen" id="gameScreen">
+    <h2>🥋 Karate Kido</h2>
+    <div style="display:flex; justify-content:space-between; width:90%; max-width:500px;">
+      <div>Враг: <span id="enemyHealth">5</span>/5</div>
+      <div>Вы: <span id="playerHealth">5</span>/5</div>
+    </div>
+    <div class="arena">
+      <div class="player" id="player">🥋</div>
+      <div class="enemy" id="enemy">🦹</div>
+    </div>
 
-  <!-- Карточка игры -->
-  <div class="game-card">
-    <div class="game-image">KARATE KIDO</div>
-    <div class="game-info">
-      <div>
-        <div class="game-title">Karate Kido</div>
-      </div>
-      <button class="play-btn">ИГРАТЬ</button>
+    <!-- Управление на мобильных -->
+    <div class="controls">
+      <div class="control-btn" id="btnLeft">←</div>
+      <div class="control-btn attack-btn" id="btnAttack">👊</div>
+      <div class="control-btn" id="btnRight">→</div>
     </div>
-  </div>
 
-  <!-- Continue playing -->
-  <div class="section">
-    <div class="section-title">
-      <span>Continue playing</span>
-      <span style="font-size:14px; opacity:0.7;">View all</span>
+    <!-- Экран результата -->
+    <div class="result-screen" id="resultScreen">
+      <h2 id="resultMessage">Победа!</h2>
+      <button class="back-btn" id="backToMenu">В меню</button>
     </div>
-    <div class="games-grid">
-      <div class="game-item">
-        <div class="game-icon">🏍️</div>
-        <div class="game-name">MotoFX</div>
-        <div class="game-category">Sport</div>
-      </div>
-      <div class="game-item">
-        <div class="game-icon">🏎️</div>
-        <div class="game-name">Ride or Die</div>
-        <div class="game-category">Action</div>
-      </div>
-      <div class="game-item">
-        <div class="game-icon">🏎️</div>
-        <div class="game-name">F1 Racer</div>
-        <div class="game-category">Sport</div>
-      </div>
-      <div class="game-item">
-        <div class="game-icon">🃏</div>
-        <div class="game-name">Wizard's 21</div>
-        <div class="game-category">Puzzle</div>
-      </div>
-      <div class="game-item">
-        <div class="game-icon">🚀</div>
-        <div class="game-name">Skipper</div>
-        <div class="game-category">Quick</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Trending games -->
-  <div class="section">
-    <div class="section-title">
-      <span>Trending games</span>
-      <span style="font-size:14px; opacity:0.7;">View all</span>
-    </div>
-    <div class="games-grid">
-      <div class="game-item">
-        <div class="game-icon">🥋</div>
-        <div class="game-name">Karate Kido</div>
-        <div class="game-category">Arcade</div>
-      </div>
-      <div class="game-item">
-        <div class="game-icon">🕹️</div>
-        <div class="game-name">Space Rush</div>
-        <div class="game-category">Action</div>
-      </div>
-      <div class="game-item">
-        <div class="game-icon">🧩</div>
-        <div class="game-name">Block Drop</div>
-        <div class="game-category">Puzzle</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Нижняя панель -->
-  <div class="footer">
-    <div class="footer-btn"><div class="footer-icon">👥</div>Сообщество</div>
-    <div class="footer-btn"><div class="footer-icon">🎡</div>Колесо</div>
-    <div class="footer-btn"><div class="footer-icon">🎮</div>Играть</div>
-    <div class="footer-btn"><div class="footer-icon">🚀</div>Ракета</div>
-    <div class="footer-btn"><div class="footer-icon">💰</div>Призы</div>
   </div>
 
   <script>
-    // Telegram WebApp initialization
+    // Telegram init
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
     }
 
-    // Обработчики кликов
-    document.querySelectorAll('.play-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        alert('Игра запущена!');
-      });
+    // Состояние игры
+    const gameState = {
+      playerPos: 50,
+      enemyPos: 300,
+      playerHealth: 5,
+      enemyHealth: 5,
+      playerAttacking: false,
+      enemyAttacking: false,
+      gameActive: false
+    };
+
+    const arenaWidth = 400;
+
+    // DOM элементы
+    const mainScreen = document.getElementById('mainScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const playerEl = document.getElementById('player');
+    const enemyEl = document.getElementById('enemy');
+    const playerHealthEl = document.getElementById('playerHealth');
+    const enemyHealthEl = document.getElementById('enemyHealth');
+    const resultScreen = document.getElementById('resultScreen');
+    const resultMessage = document.getElementById('resultMessage');
+
+    // Запуск игры
+    document.querySelector('.play-btn').addEventListener('click', startGame);
+    document.getElementById('backToMenu').addEventListener('click', backToMenu);
+
+    // Мобильные кнопки
+    document.getElementById('btnLeft').addEventListener('click', () => movePlayer(-30));
+    document.getElementById('btnRight').addEventListener('click', () => movePlayer(30));
+    document.getElementById('btnAttack').addEventListener('click', playerAttack);
+
+    // Клавиатура
+    window.addEventListener('keydown', (e) => {
+      if (!gameState.gameActive) return;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') movePlayer(-30);
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') movePlayer(30);
+      if (e.code === 'Space') playerAttack();
     });
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        alert('Фильтр: ' + btn.textContent);
-      });
-    });
+    function startGame() {
+      // Сброс состояния
+      gameState.playerHealth = 5;
+      gameState.enemyHealth = 5;
+      gameState.playerPos = 50;
+      gameState.enemyPos = 300;
+      gameState.gameActive = true;
+      
+      updateUI();
+      mainScreen.style.display = 'none';
+      gameScreen.style.display = 'flex';
+      
+      // Противник атакует случайно
+      enemyAI();
+    }
 
-    document.querySelectorAll('.footer-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        alert('Переход в раздел: ' + btn.textContent.trim());
-      });
+    function backToMenu() {
+      gameState.gameActive = false;
+      resultScreen.style.display = 'none';
+      mainScreen.style.display = 'block';
+      gameScreen.style.display = 'none';
+    }
+
+    function movePlayer(delta) {
+      if (!gameState.gameActive) return;
+      gameState.playerPos = Math.max(20, Math.min(arenaWidth - 70, gameState.playerPos + delta));
+      playerEl.style.left = gameState.playerPos + 'px';
+    }
+
+    function playerAttack() {
+      if (!gameState.gameActive || gameState.playerAttacking) return;
+      gameState.playerAttacking = true;
+      
+      // Анимация удара
+      playerEl.textContent = '💥';
+      setTimeout(() => {
+        playerEl.textContent = '🥋';
+        gameState.playerAttacking = false;
+      }, 200);
+
+      // Попадание, если рядом с врагом
+      const distance = Math.abs(gameState.playerPos - gameState.enemyPos);
+      if (distance < 80) {
+        gameState.enemyHealth--;
+        enemyHealthEl.textContent = gameState.enemyHealth;
+        if (gameState.enemyHealth <= 0) endGame(true);
+      }
+    }
+
+    function enemyAI() {
+      if (!gameState.gameActive) return;
+      
+      const action = Math.random();
+      if (action < 0.3) {
+        // Враг движется
+        const dir = Math.random() > 0.5 ? -20 : 20;
+        gameState.enemyPos = Math.max(20, Math.min(arenaWidth - 70, gameState.enemyPos + dir));
+        enemyEl.style.right = (arenaWidth - gameState.enemyPos - 50) + 'px';
+      } else if (action < 0.6 && !gameState.enemyAttacking) {
+        // Враг атакует
+        enemyAttack();
+      }
+
+      setTimeout(enemyAI, 1500);
+    }
+
+    function enemyAttack() {
+      if (!gameState.gameActive || gameState.enemyAttacking) return;
+      gameState.enemyAttacking = true;
+      
+      enemyEl.textContent = '💥';
+      setTimeout(() => {
+        enemyEl.textContent = '🦹';
+        gameState.enemyAttacking = false;
+      }, 200);
+
+      const distance = Math.abs(gameState.playerPos - gameState.enemyPos);
+      if (distance < 80) {
+        gameState.playerHealth--;
+        playerHealthEl.textContent = gameState.playerHealth;
+        if (gameState.playerHealth <= 0) endGame(false);
+      }
+    }
+
+    function endGame(isWin) {
+      gameState.gameActive = false;
+      resultMessage.textContent = isWin ? '🏆 ПОБЕДА!' : '💀 ПОРАЖЕНИЕ';
+      resultScreen.style.display = 'flex';
+      
+      // Награда за победу
+      if (isWin) {
+        alert('Вы выиграли! +10 очков и +1 билет!');
+        // Здесь можно обновить баланс через Telegram WebApp
+      }
+    }
+
+    function updateUI() {
+      playerEl.style.left = gameState.playerPos + 'px';
+      enemyEl.style.right = (arenaWidth - gameState.enemyPos - 50) + 'px';
+      playerHealthEl.textContent = gameState.playerHealth;
+      enemyHealthEl.textContent = gameState.enemyHealth;
+    }
+
+    // Личный кабинет
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      alert('Личный кабинет: Очки: 1234, Билеты: 725');
     });
   </script>
 </body>
