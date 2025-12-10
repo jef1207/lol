@@ -2,598 +2,247 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="telegram:viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аэрохоккей - Мобильная версия</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аэрохоккей - исправленная версия</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: none;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Arial', sans-serif;
             color: white;
-        }
-        
-        .game-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
         }
         
         #gameCanvas {
-            width: 100%;
-            height: 60vh;
-            max-height: 500px;
-            background: #0c2461;
-            border-radius: 20px;
-            border: 4px solid #1e3799;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            touch-action: none;
+            border: 4px solid #0f3460;
+            border-radius: 10px;
+            box-shadow: 0 0 40px rgba(0, 150, 255, 0.3);
+            background-color: #111;
         }
         
-        .score-board {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin: 15px 0;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .player-score {
+        .controls {
+            margin-top: 20px;
             text-align: center;
-            flex: 1;
+            background: rgba(15, 52, 96, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            width: 800px;
         }
         
-        .player-name {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        .player {
+            display: inline-block;
+            margin: 0 30px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
         }
         
-        .player1-name {
-            color: #4a69bd;
+        .player1 {
+            background-color: #3498db;
+            color: white;
         }
         
-        .player2-name {
-            color: #e55039;
+        .player2 {
+            background-color: #e74c3c;
+            color: white;
         }
         
         .score {
-            font-size: 36px;
-            font-weight: 700;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .controls-info {
-            text-align: center;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            margin: 10px 0;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .controls-area {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 15px;
-            padding: 0 10px;
-        }
-        
-        .control-hint {
-            width: 45%;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            text-align: center;
-            font-size: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .btn {
-            padding: 14px 25px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex: 1;
-            max-width: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn:active {
-            transform: scale(0.95);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(to right, #4a69bd, #6a89cc);
-            color: white;
-            box-shadow: 0 4px 15px rgba(74, 105, 189, 0.4);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .icon {
-            font-size: 20px;
-        }
-        
-        .game-title {
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 28px;
-            font-weight: 700;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(to right, #4a69bd, #e55039);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .goal-animation {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 32px;
-            font-weight: 700;
-            text-align: center;
-            z-index: 100;
-            text-shadow: 0 0 20px currentColor;
-            animation: goalPulse 1s ease-out;
-            pointer-events: none;
-        }
-        
-        @keyframes goalPulse {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-        
-        .mobile-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-        }
-        
-        .mobile-overlay.hidden {
-            display: none;
-        }
-        
-        .tap-hint {
             font-size: 24px;
-            margin-top: 20px;
-            color: #4a69bd;
-            animation: pulse 1.5s infinite;
+            margin: 10px 0;
         }
         
-        @keyframes pulse {
-            0% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0.5; transform: scale(1); }
+        .instructions {
+            margin-top: 15px;
+            font-size: 14px;
+            opacity: 0.8;
         }
         
-        /* Адаптация для очень маленьких экранов */
-        @media (max-height: 600px) {
-            #gameCanvas {
-                height: 50vh;
-            }
-            
-            .score {
-                font-size: 28px;
-            }
-            
-            .game-title {
-                font-size: 24px;
-            }
+        h1 {
+            color: #4cc9f0;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+            margin-bottom: 10px;
         }
         
-        @media (max-width: 350px) {
-            .buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                max-width: 100%;
-            }
+        .reset-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #4cc9f0;
+            border: none;
+            border-radius: 5px;
+            color: #16213e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        /* Стили для индикаторов касаний */
-        .touch-indicator {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.5);
-            pointer-events: none;
-            z-index: 10;
-            transform: translate(-50%, -50%);
-            display: none;
+        .reset-btn:hover {
+            background: #2fa4d6;
+            transform: scale(1.05);
         }
         
-        .touch-indicator.active {
-            display: block;
+        .debug {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #aaa;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
-    <h1 class="game-title">🏒 АЭРОХОККЕЙ 🏒</h1>
+    <h1>АЭРОХОККЕЙ (ИСПРАВЛЕННАЯ ВЕРСИЯ)</h1>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
     
-    <div class="game-container">
-        <canvas id="gameCanvas"></canvas>
-        
-        <div id="goalAnimation" class="goal-animation" style="display: none;"></div>
-        
-        <div class="touch-indicator" id="touchIndicator1"></div>
-        <div class="touch-indicator" id="touchIndicator2"></div>
-        
-        <div class="mobile-overlay" id="mobileOverlay">
-            <h2>Готовы к игре?</h2>
-            <p>Управляйте своей битой, касаясь и перемещая палец по экрану</p>
-            <div class="tap-hint">👇 Коснитесь экрана, чтобы начать 👇</div>
-        </div>
-    </div>
-    
-    <div class="score-board">
-        <div class="player-score">
-            <div class="player-name player1-name">
-                <span>🔵 Игрок 1</span>
-            </div>
-            <div class="score" id="score1">0</div>
+    <div class="controls">
+        <div class="score">
+            <span class="player player1">Игрок 1: <span id="score1">0</span></span>
+            <span style="margin: 0 20px;">:</span>
+            <span class="player player2">Игрок 2: <span id="score2">0</span></span>
         </div>
         
-        <div style="font-size: 30px; padding: 0 15px;">:</div>
-        
-        <div class="player-score">
-            <div class="player-name player2-name">
-                <span>🔴 Игрок 2</span>
-            </div>
-            <div class="score" id="score2">0</div>
+        <div class="instructions">
+            <div><span class="player1">Игрок 1:</span> W (вверх), S (вниз), A (влево), D (вправо)</div>
+            <div><span class="player2">Игрок 2:</span> Стрелки ← ↑ → ↓</div>
         </div>
-    </div>
-    
-    <div class="controls-info">
-        <div><strong>Игрок 1:</strong> Левый экран</div>
-        <div><strong>Игрок 2:</strong> Правый экран</div>
-        <div style="margin-top: 5px; opacity: 0.8; font-size: 12px;">Касайтесь и перемещайте палец для управления</div>
-    </div>
-    
-    <div class="buttons">
-        <button class="btn btn-primary" id="resetBtn">
-            <span class="icon">🔄</span> Новая игра
-        </button>
-        <button class="btn btn-secondary" id="pauseBtn">
-            <span class="icon">⏸️</span> Пауза
-        </button>
+        
+        <button class="reset-btn" onclick="resetGame()">Новая игра</button>
+        <div class="debug" id="debugInfo"></div>
     </div>
 
     <script>
-        // Инициализация для Telegram Mini App
-        let tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.expand(); // Развернуть на весь экран
-            tg.enableClosingConfirmation(); // Включить подтверждение при закрытии
-            tg.setHeaderColor('#4a69bd'); // Установить цвет шапки
-            tg.setBackgroundColor('#0c2461'); // Установить цвет фона
-        }
-
         // Получаем элементы
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const score1Element = document.getElementById('score1');
         const score2Element = document.getElementById('score2');
-        const goalAnimation = document.getElementById('goalAnimation');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-        const resetBtn = document.getElementById('resetBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const touchIndicator1 = document.getElementById('touchIndicator1');
-        const touchIndicator2 = document.getElementById('touchIndicator2');
+        const debugInfo = document.getElementById('debugInfo');
 
-        // Устанавливаем размеры canvas в зависимости от устройства
-        function resizeCanvas() {
-            const container = canvas.parentElement;
-            const containerWidth = container.clientWidth;
-            const containerHeight = Math.min(containerWidth * 0.8, window.innerHeight * 0.6);
-            
-            canvas.width = containerWidth;
-            canvas.height = containerHeight;
-            
-            // Обновляем размеры игровых объектов
-            game.field.width = canvas.width;
-            game.field.height = canvas.height;
-            game.field.centerX = canvas.width / 2;
-            game.field.centerY = canvas.height / 2;
-            
-            // Пересчитываем позиции
-            resetPuck();
-            game.player1.x = game.player1.width * 2;
-            game.player1.y = game.field.centerY;
-            game.player2.x = game.field.width - game.player2.width * 2;
-            game.player2.y = game.field.centerY;
-        }
+        // Размеры поля
+        const FIELD_WIDTH = canvas.width;
+        const FIELD_HEIGHT = canvas.height;
+        const CENTER_X = FIELD_WIDTH / 2;
+        const CENTER_Y = FIELD_HEIGHT / 2;
 
-        // Игровые объекты и настройки
+        // Игровые объекты
         const game = {
-            field: {
-                width: 0,
-                height: 0,
-                centerX: 0,
-                centerY: 0
-            },
             puck: {
-                x: 0,
-                y: 0,
-                radius: 12,
-                speedX: 4,
-                speedY: 2,
-                color: '#f6b93b'
+                x: CENTER_X,
+                y: CENTER_Y,
+                radius: 15,
+                speedX: 5,
+                speedY: 3,
+                color: '#f1c40f'
             },
+            
             player1: {
-                x: 0,
-                y: 0,
-                width: 16,
-                height: 60,
-                color: '#4a69bd',
+                x: 80,
+                y: CENTER_Y,
+                width: 20,
+                height: 80,
+                speed: 8,
+                color: '#3498db',
                 score: 0,
-                touchId: null,
-                lastTouchX: 0,
-                lastTouchY: 0
+                keys: { up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD' }
             },
+            
             player2: {
-                x: 0,
-                y: 0,
-                width: 16,
-                height: 60,
-                color: '#e55039',
+                x: FIELD_WIDTH - 80,
+                y: CENTER_Y,
+                width: 20,
+                height: 80,
+                speed: 8,
+                color: '#e74c3c',
                 score: 0,
-                touchId: null,
-                lastTouchX: 0,
-                lastTouchY: 0
+                keys: { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' }
             },
+            
+            // Состояния клавиш
+            keysPressed: {},
+            
+            // Центральная линия и ворота
+            centerLine: {
+                color: '#0f3460',
+                width: 4,
+                dashLength: 20
+            },
+            
             goals: {
-                width: 12,
-                height: 120,
-                color: '#8395a7'
+                width: 15,
+                height: 150,
+                color: '#7f8c8d'
             },
-            isPaused: false,
-            isGameStarted: false,
-            touchPoints: new Map(),
+            
+            // Флаги для отслеживания состояния игры
+            gameActive: true,
             lastUpdate: 0
         };
 
-        // Обработчики событий для мобильных устройств
-        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-        canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
-
-        // Обработчики для кнопок
-        resetBtn.addEventListener('click', resetGame);
-        pauseBtn.addEventListener('click', togglePause);
-
-        // Запуск игры при первом касании
-        canvas.addEventListener('touchstart', () => {
-            if (!game.isGameStarted) {
-                game.isGameStarted = true;
-                mobileOverlay.classList.add('hidden');
-                if (!game.isPaused) {
+        // Обработчики клавиш
+        window.addEventListener('keydown', (e) => {
+            game.keysPressed[e.code] = true;
+            
+            // Пробел для паузы
+            if (e.code === 'Space') {
+                game.gameActive = !game.gameActive;
+                if (game.gameActive) {
+                    game.lastUpdate = Date.now();
                     requestAnimationFrame(gameLoop);
                 }
             }
         });
 
-        // Обработка начала касания
-        function handleTouchStart(e) {
-            e.preventDefault();
-            const touches = e.changedTouches;
-            
-            for (let i = 0; i < touches.length; i++) {
-                const touch = touches[i];
-                const rect = canvas.getBoundingClientRect();
-                const x = touch.clientX - rect.left;
-                const y = touch.clientY - rect.top;
-                
-                // Определяем, какой игрок коснулся экрана
-                const isLeftSide = x < game.field.centerX;
-                
-                if (isLeftSide && !game.player1.touchId) {
-                    game.player1.touchId = touch.identifier;
-                    game.player1.lastTouchX = x;
-                    game.player1.lastTouchY = y;
-                    
-                    // Показать индикатор касания
-                    touchIndicator1.style.left = touch.clientX + 'px';
-                    touchIndicator1.style.top = touch.clientY + 'px';
-                    touchIndicator1.classList.add('active');
-                } else if (!isLeftSide && !game.player2.touchId) {
-                    game.player2.touchId = touch.identifier;
-                    game.player2.lastTouchX = x;
-                    game.player2.lastTouchY = y;
-                    
-                    // Показать индикатор касания
-                    touchIndicator2.style.left = touch.clientX + 'px';
-                    touchIndicator2.style.top = touch.clientY + 'px';
-                    touchIndicator2.classList.add('active');
-                }
-                
-                // Сохраняем все точки касания
-                game.touchPoints.set(touch.identifier, { x, y });
-            }
-        }
+        window.addEventListener('keyup', (e) => {
+            game.keysPressed[e.code] = false;
+        });
 
-        // Обработка перемещения пальца
-        function handleTouchMove(e) {
-            e.preventDefault();
-            const touches = e.changedTouches;
-            
-            for (let i = 0; i < touches.length; i++) {
-                const touch = touches[i];
-                const rect = canvas.getBoundingClientRect();
-                const x = touch.clientX - rect.left;
-                const y = touch.clientY - rect.top;
-                
-                // Обновляем позицию индикатора касания
-                if (touch.identifier === game.player1.touchId) {
-                    touchIndicator1.style.left = touch.clientX + 'px';
-                    touchIndicator1.style.top = touch.clientY + 'px';
-                } else if (touch.identifier === game.player2.touchId) {
-                    touchIndicator2.style.left = touch.clientX + 'px';
-                    touchIndicator2.style.top = touch.clientY + 'px';
-                }
-                
-                // Перемещаем соответствующего игрока
-                if (touch.identifier === game.player1.touchId) {
-                    movePlayer(game.player1, x, y);
-                    game.player1.lastTouchX = x;
-                    game.player1.lastTouchY = y;
-                } else if (touch.identifier === game.player2.touchId) {
-                    movePlayer(game.player2, x, y);
-                    game.player2.lastTouchX = x;
-                    game.player2.lastTouchY = y;
-                }
-                
-                // Обновляем точку касания
-                game.touchPoints.set(touch.identifier, { x, y });
-            }
-        }
-
-        // Обработка окончания касания
-        function handleTouchEnd(e) {
-            e.preventDefault();
-            const touches = e.changedTouches;
-            
-            for (let i = 0; i < touches.length; i++) {
-                const touch = touches[i];
-                
-                // Скрываем индикатор касания
-                if (touch.identifier === game.player1.touchId) {
-                    game.player1.touchId = null;
-                    touchIndicator1.classList.remove('active');
-                } else if (touch.identifier === game.player2.touchId) {
-                    game.player2.touchId = null;
-                    touchIndicator2.classList.remove('active');
-                }
-                
-                // Удаляем точку касания
-                game.touchPoints.delete(touch.identifier);
-            }
-        }
-
-        // Перемещение игрока к целевой позиции
-        function movePlayer(player, targetX, targetY) {
-            // Ограничиваем движение по X (игроки не могут заходить на чужую половину)
-            let newX = targetX;
-            if (player === game.player1) {
-                newX = Math.max(player.width, Math.min(game.field.centerX - player.width, newX));
-            } else {
-                newX = Math.max(game.field.centerX + player.width, Math.min(game.field.width - player.width, newX));
-            }
-            
-            // Ограничиваем движение по Y
-            let newY = targetY;
-            newY = Math.max(player.height, Math.min(game.field.height - player.height, newY));
-            
-            // Плавное перемещение
-            player.x += (newX - player.x) * 0.3;
-            player.y += (newY - player.y) * 0.3;
-        }
-
-        // Рисование игрового поля
+        // Функция рисования
         function draw() {
             // Очищаем canvas
-            ctx.fillStyle = '#0c2461';
-            ctx.fillRect(0, 0, game.field.width, game.field.height);
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, FIELD_WIDTH, FIELD_HEIGHT);
             
             // Рисуем центральную линию (пунктир)
             ctx.beginPath();
-            ctx.setLineDash([15, 15]);
-            ctx.moveTo(game.field.centerX, 0);
-            ctx.lineTo(game.field.centerX, game.field.height);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.lineWidth = 3;
+            ctx.setLineDash([game.centerLine.dashLength, game.centerLine.dashLength]);
+            ctx.moveTo(CENTER_X, 0);
+            ctx.lineTo(CENTER_X, FIELD_HEIGHT);
+            ctx.strokeStyle = game.centerLine.color;
+            ctx.lineWidth = game.centerLine.width;
             ctx.stroke();
             ctx.setLineDash([]);
             
             // Рисуем центральный круг
             ctx.beginPath();
-            ctx.arc(game.field.centerX, game.field.centerY, 40, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.lineWidth = 3;
+            ctx.arc(CENTER_X, CENTER_Y, 50, 0, Math.PI * 2);
+            ctx.strokeStyle = '#0f3460';
+            ctx.lineWidth = 4;
             ctx.stroke();
             
             // Рисуем ворота
-            ctx.fillStyle = game.goals.color;
             // Левые ворота
-            ctx.fillRect(0, (game.field.height - game.goals.height) / 2, 
-                        game.goals.width, game.goals.height);
-            // Правые ворота
-            ctx.fillRect(game.field.width - game.goals.width, 
-                        (game.field.height - game.goals.height) / 2, 
-                        game.goals.width, game.goals.height);
+            ctx.fillStyle = game.goals.color;
+            ctx.fillRect(0, (FIELD_HEIGHT - game.goals.height) / 2, game.goals.width, game.goals.height);
             
-            // Рисуем игроков с закругленными краями
+            // Правые ворота
+            ctx.fillRect(FIELD_WIDTH - game.goals.width, (FIELD_HEIGHT - game.goals.height) / 2, game.goals.width, game.goals.height);
+            
+            // Рисуем игроков
             drawPlayer(game.player1);
             drawPlayer(game.player2);
             
             // Рисуем шайбу
             drawPuck();
+            
+            // Отображаем информацию для отладки
+            debugInfo.textContent = `Шайба: X=${Math.round(game.puck.x)}, Y=${Math.round(game.puck.y)}, VX=${game.puck.speedX.toFixed(2)}, VY=${game.puck.speedY.toFixed(2)}`;
         }
 
         function drawPlayer(player) {
-            // Основной прямоугольник
             ctx.fillStyle = player.color;
             ctx.fillRect(
                 player.x - player.width / 2,
@@ -602,7 +251,8 @@
                 player.height
             );
             
-            // Закругленные углы
+            // Закругленные края
+            ctx.fillStyle = player.color;
             ctx.beginPath();
             ctx.arc(
                 player.x - player.width / 2,
@@ -637,31 +287,34 @@
         }
 
         function drawPuck() {
-            // Основной круг шайбы
             ctx.fillStyle = game.puck.color;
             ctx.beginPath();
             ctx.arc(game.puck.x, game.puck.y, game.puck.radius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Блики для объема
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            // Эффект объема
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
             ctx.beginPath();
             ctx.arc(
                 game.puck.x - game.puck.radius / 3,
                 game.puck.y - game.puck.radius / 3,
-                game.puck.radius / 2.5,
+                game.puck.radius / 2,
                 0, Math.PI * 2
             );
             ctx.fill();
         }
 
-        // Обновление игровой логики
+        // Обновление игры
         function update() {
+            // Двигаем игроков
+            movePlayer(game.player1);
+            movePlayer(game.player2);
+            
             // Двигаем шайбу
             game.puck.x += game.puck.speedX;
             game.puck.y += game.puck.speedY;
             
-            // Проверяем столкновения с границами
+            // Проверяем столкновения шайбы с границами поля
             checkBoundaries();
             
             // Проверяем голы
@@ -672,82 +325,103 @@
             checkCollision(game.player2);
             
             // Ограничиваем скорость шайбы
-            const maxSpeed = 12;
-            const currentSpeed = Math.sqrt(
-                game.puck.speedX * game.puck.speedX + 
-                game.puck.speedY * game.puck.speedY
-            );
+            const maxSpeed = 15;
+            const currentSpeed = Math.sqrt(game.puck.speedX * game.puck.speedX + game.puck.speedY * game.puck.speedY);
             if (currentSpeed > maxSpeed) {
                 game.puck.speedX = (game.puck.speedX / currentSpeed) * maxSpeed;
                 game.puck.speedY = (game.puck.speedY / currentSpeed) * maxSpeed;
             }
             
-            // Добавляем трение
+            // Добавляем небольшое трение
             game.puck.speedX *= 0.995;
             game.puck.speedY *= 0.995;
-            
-            // Если шайба почти остановилась, добавляем минимальную скорость
-            if (Math.abs(game.puck.speedX) < 0.1) game.puck.speedX = 0;
-            if (Math.abs(game.puck.speedY) < 0.1) game.puck.speedY = 0;
         }
 
         function checkBoundaries() {
             // Верхняя граница
             if (game.puck.y - game.puck.radius <= 0) {
-                game.puck.y = game.puck.radius;
-                game.puck.speedY = Math.abs(game.puck.speedY) * 0.9;
+                game.puck.y = game.puck.radius; // Возвращаем шайбу на границу
+                game.puck.speedY = Math.abs(game.puck.speedY) * 0.9; // Отскок с потерей энергии
             }
             
             // Нижняя граница
-            if (game.puck.y + game.puck.radius >= game.field.height) {
-                game.puck.y = game.field.height - game.puck.radius;
-                game.puck.speedY = -Math.abs(game.puck.speedY) * 0.9;
+            if (game.puck.y + game.puck.radius >= FIELD_HEIGHT) {
+                game.puck.y = FIELD_HEIGHT - game.puck.radius; // Возвращаем шайбу на границу
+                game.puck.speedY = -Math.abs(game.puck.speedY) * 0.9; // Отскок с потерей энергии
             }
             
             // Левая граница (не ворота)
             if (game.puck.x - game.puck.radius <= game.goals.width) {
-                if (game.puck.y < (game.field.height - game.goals.height) / 2 || 
-                    game.puck.y > (game.field.height + game.goals.height) / 2) {
-                    game.puck.x = game.goals.width + game.puck.radius;
-                    game.puck.speedX = Math.abs(game.puck.speedX) * 0.9;
+                // Проверяем, не в воротах ли шайба по Y
+                if (game.puck.y < (FIELD_HEIGHT - game.goals.height) / 2 || 
+                    game.puck.y > (FIELD_HEIGHT + game.goals.height) / 2) {
+                    game.puck.x = game.goals.width + game.puck.radius; // Возвращаем шайбу на границу
+                    game.puck.speedX = Math.abs(game.puck.speedX) * 0.9; // Отскок
                 }
             }
             
             // Правая граница (не ворота)
-            if (game.puck.x + game.puck.radius >= game.field.width - game.goals.width) {
-                if (game.puck.y < (game.field.height - game.goals.height) / 2 || 
-                    game.puck.y > (game.field.height + game.goals.height) / 2) {
-                    game.puck.x = game.field.width - game.goals.width - game.puck.radius;
-                    game.puck.speedX = -Math.abs(game.puck.speedX) * 0.9;
+            if (game.puck.x + game.puck.radius >= FIELD_WIDTH - game.goals.width) {
+                // Проверяем, не в воротах ли шайба по Y
+                if (game.puck.y < (FIELD_HEIGHT - game.goals.height) / 2 || 
+                    game.puck.y > (FIELD_HEIGHT + game.goals.height) / 2) {
+                    game.puck.x = FIELD_WIDTH - game.goals.width - game.puck.radius; // Возвращаем шайбу на границу
+                    game.puck.speedX = -Math.abs(game.puck.speedX) * 0.9; // Отскок
                 }
             }
             
-            // Если шайба улетела за пределы (на всякий случай)
-            if (game.puck.x < -50 || game.puck.x > game.field.width + 50 ||
-                game.puck.y < -50 || game.puck.y > game.field.height + 50) {
+            // Дополнительная защита: если шайба все же ушла за пределы, вернем ее
+            if (game.puck.x < -game.puck.radius * 2 || 
+                game.puck.x > FIELD_WIDTH + game.puck.radius * 2 ||
+                game.puck.y < -game.puck.radius * 2 || 
+                game.puck.y > FIELD_HEIGHT + game.puck.radius * 2) {
+                console.warn("Шайба вышла за пределы поля, возвращаем в центр");
                 resetPuck();
             }
         }
 
+        function movePlayer(player) {
+            // Двигаем вверх/вниз
+            if (game.keysPressed[player.keys.up] && player.y - player.height / 2 > 0) {
+                player.y -= player.speed;
+            }
+            if (game.keysPressed[player.keys.down] && player.y + player.height / 2 < FIELD_HEIGHT) {
+                player.y += player.speed;
+            }
+            
+            // Двигаем влево/вправо с ограничениями
+            if (game.keysPressed[player.keys.left]) {
+                if (player === game.player1 && player.x - player.width / 2 > game.goals.width + 5) {
+                    player.x -= player.speed;
+                } else if (player === game.player2 && player.x - player.width / 2 > CENTER_X + 10) {
+                    player.x -= player.speed;
+                }
+            }
+            if (game.keysPressed[player.keys.right]) {
+                if (player === game.player1 && player.x + player.width / 2 < CENTER_X - 10) {
+                    player.x += player.speed;
+                } else if (player === game.player2 && player.x + player.width / 2 < FIELD_WIDTH - game.goals.width - 5) {
+                    player.x += player.speed;
+                }
+            }
+        }
+
         function checkCollision(player) {
-            // Вычисляем ближайшую точку на прямоугольнике игрока
-            const closestX = Math.max(
-                player.x - player.width / 2,
-                Math.min(game.puck.x, player.x + player.width / 2)
-            );
-            const closestY = Math.max(
-                player.y - player.height / 2,
-                Math.min(game.puck.y, player.y + player.height / 2)
-            );
+            // Вычисляем ближайшую точку на прямоугольнике игрока к центру шайбы
+            const closestX = Math.max(player.x - player.width / 2, 
+                                     Math.min(game.puck.x, player.x + player.width / 2));
+            const closestY = Math.max(player.y - player.height / 2, 
+                                     Math.min(game.puck.y, player.y + player.height / 2));
             
             const distanceX = game.puck.x - closestX;
             const distanceY = game.puck.y - closestY;
             const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
             
             if (distance < game.puck.radius) {
-                // Нормаль столкновения
+                // Находим нормаль столкновения
                 let normalX, normalY;
                 if (distance === 0) {
+                    // Если центры совпали (редкий случай)
                     normalX = game.puck.x - player.x;
                     normalY = game.puck.y - player.y;
                     const length = Math.sqrt(normalX * normalX + normalY * normalY);
@@ -758,73 +432,88 @@
                     normalY = distanceY / distance;
                 }
                 
-                // Упругость удара
-                const elasticity = 1.1;
-                game.puck.speedX = normalX * 8 * elasticity;
-                game.puck.speedY = normalY * 8 * elasticity;
+                // Добавляем скорость от движения игрока
+                let playerSpeedX = 0;
+                let playerSpeedY = 0;
+                
+                if (game.keysPressed[player.keys.up]) playerSpeedY = -1.5;
+                if (game.keysPressed[player.keys.down]) playerSpeedY = 1.5;
+                if (game.keysPressed[player.keys.left]) playerSpeedX = -1.5;
+                if (game.keysPressed[player.keys.right]) playerSpeedX = 1.5;
+                
+                // Обновляем скорость шайбы с учетом упругости
+                const elasticity = 1.1; // Коэффициент упругости
+                game.puck.speedX = (normalX * 8 + playerSpeedX) * elasticity;
+                game.puck.speedY = (normalY * 8 + playerSpeedY) * elasticity;
                 
                 // Сдвигаем шайбу, чтобы избежать залипания
                 const overlap = game.puck.radius - distance + 1;
                 game.puck.x += normalX * overlap;
                 game.puck.y += normalY * overlap;
                 
-                // Виброотклик (если поддерживается)
-                if (navigator.vibrate) {
-                    navigator.vibrate(30);
-                }
+                // Звуковой эффект (имитация)
+                playHitSound();
             }
         }
 
         function checkGoals() {
-            // Левые ворота (гол игроку 2)
+            // Проверяем левые ворота
             if (game.puck.x - game.puck.radius <= game.goals.width) {
-                if (game.puck.y > (game.field.height - game.goals.height) / 2 && 
-                    game.puck.y < (game.field.height + game.goals.height) / 2) {
+                if (game.puck.y > (FIELD_HEIGHT - game.goals.height) / 2 && 
+                    game.puck.y < (FIELD_HEIGHT + game.goals.height) / 2) {
                     game.player2.score++;
                     score2Element.textContent = game.player2.score;
-                    showGoalAnimation("⚽ ГОЛ! ⚽", "#e55039");
+                    showGoalAnimation("Игрок 2 забил гол!");
                     resetPuck();
                     return;
                 }
             }
             
-            // Правые ворота (гол игроку 1)
-            if (game.puck.x + game.puck.radius >= game.field.width - game.goals.width) {
-                if (game.puck.y > (game.field.height - game.goals.height) / 2 && 
-                    game.puck.y < (game.field.height + game.goals.height) / 2) {
+            // Проверяем правые ворота
+            if (game.puck.x + game.puck.radius >= FIELD_WIDTH - game.goals.width) {
+                if (game.puck.y > (FIELD_HEIGHT - game.goals.height) / 2 && 
+                    game.puck.y < (FIELD_HEIGHT + game.goals.height) / 2) {
                     game.player1.score++;
                     score1Element.textContent = game.player1.score;
-                    showGoalAnimation("⚽ ГОЛ! ⚽", "#4a69bd");
+                    showGoalAnimation("Игрок 1 забил гол!");
                     resetPuck();
                     return;
                 }
             }
         }
 
-        function showGoalAnimation(text, color) {
-            goalAnimation.textContent = text;
-            goalAnimation.style.color = color;
-            goalAnimation.style.display = 'block';
+        function showGoalAnimation(message) {
+            // Простая анимация гола
+            ctx.save();
+            ctx.font = "bold 40px Arial";
+            ctx.fillStyle = "#f1c40f";
+            ctx.textAlign = "center";
+            ctx.shadowColor = "rgba(241, 196, 15, 0.8)";
+            ctx.shadowBlur = 20;
+            ctx.fillText(message, CENTER_X, 100);
+            ctx.restore();
             
-            // Скрываем анимацию через 1.5 секунды
+            // Через 1 секунду анимация исчезнет
             setTimeout(() => {
-                goalAnimation.style.display = 'none';
-            }, 1500);
+                // Перерисовываем поле
+                draw();
+            }, 1000);
         }
 
         function resetPuck() {
-            game.puck.x = game.field.centerX;
-            game.puck.y = game.field.centerY;
+            game.puck.x = CENTER_X;
+            game.puck.y = CENTER_Y;
             
-            // Случайное направление
-            game.puck.speedX = (Math.random() > 0.5 ? 1 : -1) * 4;
-            game.puck.speedY = (Math.random() > 0.5 ? 1 : -1) * 2;
+            // Случайное направление после гола
+            game.puck.speedX = (Math.random() > 0.5 ? 1 : -1) * 5;
+            game.puck.speedY = (Math.random() > 0.5 ? 1 : -1) * 3;
             
-            // Возвращаем игроков на стартовые позиции
-            game.player1.x = game.player1.width * 2;
-            game.player1.y = game.field.centerY;
-            game.player2.x = game.field.width - game.player2.width * 2;
-            game.player2.y = game.field.centerY;
+            // Сбрасываем позиции игроков
+            game.player1.x = 80;
+            game.player1.y = CENTER_Y;
+            
+            game.player2.x = FIELD_WIDTH - 80;
+            game.player2.y = CENTER_Y;
         }
 
         function resetGame() {
@@ -833,75 +522,50 @@
             score1Element.textContent = '0';
             score2Element.textContent = '0';
             
-            resetPuck();
-            game.isPaused = false;
-            pauseBtn.innerHTML = '<span class="icon">⏸️</span> Пауза';
+            // Сброс позиций
+            game.player1.x = 80;
+            game.player1.y = CENTER_Y;
             
-            // Если игра еще не начата, показываем оверлей
-            if (!game.isGameStarted) {
-                mobileOverlay.classList.remove('hidden');
-            }
+            game.player2.x = FIELD_WIDTH - 80;
+            game.player2.y = CENTER_Y;
+            
+            resetPuck();
         }
 
-        function togglePause() {
-            game.isPaused = !game.isPaused;
-            if (game.isPaused) {
-                pauseBtn.innerHTML = '<span class="icon">▶️</span> Продолжить';
-            } else {
-                pauseBtn.innerHTML = '<span class="icon">⏸️</span> Пауза';
-                if (game.isGameStarted) {
-                    requestAnimationFrame(gameLoop);
-                }
-            }
+        // Имитация звука удара
+        function playHitSound() {
+            // В реальной игре здесь был бы Audio объект
+            // Для примера просто выводим в консоль
+            console.log('Хит!');
         }
 
         // Игровой цикл
-        function gameLoop(timestamp) {
-            if (!game.isPaused && game.isGameStarted) {
-                const deltaTime = timestamp - game.lastUpdate;
-                
-                // Ограничиваем FPS для экономии батареи
-                if (deltaTime > 16) { // ~60 FPS
-                    update();
-                    draw();
-                    game.lastUpdate = timestamp;
-                }
-                
-                requestAnimationFrame(gameLoop);
-            } else if (game.isPaused) {
-                // Рисуем текст "Пауза" поверх игры
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                ctx.fillRect(0, 0, game.field.width, game.field.height);
-                
-                ctx.font = 'bold 32px Arial';
-                ctx.fillStyle = 'white';
-                ctx.textAlign = 'center';
-                ctx.fillText('ПАУЗА', game.field.centerX, game.field.centerY - 20);
-                ctx.font = '18px Arial';
-                ctx.fillText('Коснитесь экрана, чтобы продолжить', 
-                            game.field.centerX, game.field.centerY + 30);
+        function gameLoop() {
+            if (!game.gameActive) {
+                // Если игра на паузе, показываем сообщение
+                ctx.save();
+                ctx.font = "30px Arial";
+                ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                ctx.textAlign = "center";
+                ctx.fillText("ПАУЗА (нажмите ПРОБЕЛ)", CENTER_X, CENTER_Y);
+                ctx.restore();
+                return;
             }
+            
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
         }
 
-        // Инициализация игры
-        window.addEventListener('load', () => {
-            resizeCanvas();
-            resetGame();
-            draw(); // Начальная отрисовка
-            
-            // Если Telegram Mini App, отправляем данные об игре
-            if (tg) {
-                tg.ready();
-            }
-        });
+        // Запуск игры
+        resetPuck();
+        game.lastUpdate = Date.now();
+        gameLoop();
 
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('orientationchange', () => {
-            setTimeout(resizeCanvas, 100);
+        // Инструкции при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            draw();
         });
-
-        // Отключаем контекстное меню на canvas
-        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     </script>
 </body>
 </html>
