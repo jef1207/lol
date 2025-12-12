@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Камушки — 100 уровней</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      margin: 0;
+      padding: 16px;
+      color: #333;
+    }
+    h1 {
+      font-size: 24px;           /* ← уменьшено */
+      font-weight: 600;          /* ← не жирный, но выразительный */
+      color: #2c3e50;
+      margin: 8px 0 4px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.08);
+    }
+    .level-badge {
+      font-size: 20px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #3498db, #2c3e50);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 6px 0;
+    }
+    .status {
+      margin: 10px 0;
+      font-size: 16px;           /* ← чуть меньше */
+      font-weight: 500;
+      background: #fff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      display: flex;
+      gap: 14px;                 /* ← элементы в одной строке с отступами */
+      align-items: center;
+    }
+    .status span { white-space: nowrap; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 88px);
+      grid-template-rows: repeat(3, 88px);
+      gap: 6px;
+      margin: 16px 0;
+    }
+    .cell {
+      width: 88px;
+      height: 88px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 26px;
+      font-weight: bold;
+      border-radius: 10px;
+      background: #3498db;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+      user-select: none;
+      transition: all 0.22s cubic-bezier(0.2, 0.8, 0.3, 1.1);
+    }
+    .cell:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.22);
+    }
+    .empty {
+      background: #ecf0f1;
+      cursor: default;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .hinted {
+      background: #f1c40f !important;
+      box-shadow: 0 0 12px rgba(241, 196, 15, 0.7) !important;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    .controls {
+      margin: 14px 0;
+    }
+    button {
+      padding: 10px 18px;
+      margin: 0 6px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(to right, #2980b9, #3498db);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 5px rgba(0,0,0,0.15);
+      transition: all 0.18s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 7px rgba(0,0,0,0.2);
+    }
+    button:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .progress-bar {
+      width: 76%;
+      height: 8px;
+      background: #ecf0f1;
+      border-radius: 4px;
+      margin: 8px 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, #2ecc71, #1abc9c);
+      width: 1%;
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>Камушки — 100 уровней</h1>
+  <div class="level-badge">Уровень: <span id="level">1</span> / 100</div>
+  
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="status">
+    <span>⏱️ <span id="timer">0:00</span></span>
+    <span>👣 <span id="moves">0</span></span>
+    <span>🎯 <span id="minMovesHint">Мин. ходов: 6</span></span>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="controls">
+    <button id="hintBtn">💡 Подсказать ход</button>
+  </div>
+
+  <script>
+    // === КЭШИРОВАНИЕ УРОВНЕЙ ===
+    const LEVEL_CACHE = {};
+    let cacheReady = false;
+
+    function generateAllLevels(maxLevel = 100) {
+      const winState = [1, 2, 3, 4, 5, 6, 7, 8, null];
+      const queue = [[winState, 0]];
+      const visited = new Map();
+      visited.set(winState.join(','), 0);
+      const neededDepths = new Set(Array.from({length: maxLevel}, (_, i) => 6 + i)); // 6..105
+
+      while (queue.length && neededDepths.size > 0) {
+        const [state, depth] = queue.shift();
+        if (neededDepths.has(depth)) {
+          for (let lvl = 1; lvl <= maxLevel; lvl++) {
+            if (!LEVEL_CACHE[lvl] && 5 + lvl === depth) {
+              LEVEL_CACHE[lvl] = state.slice();
+              neededDepths.delete(depth);
+            }
+          }
+        }
+        if (neededDepths.size === 0) break;
+
+        const emptyIndex = state.indexOf(null);
+        const moves = [];
+        const row = Math.floor(emptyIndex / 3), col = emptyIndex % 3;
+        if (row > 0) moves.push(emptyIndex - 3);
+        if (row < 2) moves.push(emptyIndex + 3);
+        if (col > 0) moves.push(emptyIndex - 1);
+        if (col < 2) moves.push(emptyIndex + 1);
+
+        for (const idx of moves) {
+          const newState = state.slice();
+          [newState[emptyIndex], newState[idx]] = [newState[idx], newState[emptyIndex]];
+          const key = newState.join(',');
+          if (!visited.has(key)) {
+            visited.set(key, depth + 1);
+            if (depth + 1 <= 105) {
+              queue.push([newState, depth + 1]);
+            }
+          }
+        }
+      }
+      cacheReady = true;
+    }
+
+    // === ИНИЦИАЛИЗАЦИЯ ===
+    const board = document.getElementById('board');
+    const hintBtn = document.getElementById('hintBtn');
+    const timerEl = document.getElementById('timer');
+    const movesEl = document.getElementById('moves');
+    const levelEl = document.getElementById('level');
+    const minMovesEl = document.getElementById('minMovesHint');
+    const progressFill = document.getElementById('progressFill');
+
+    let state = [];
+    let startTime = null;
+    let timeInterval = null;
+    let movesCount = 0;
+    let currentLevel = 1;
+    let gameActive = false;
+
+    generateAllLevels(100);
+
+    function initLevel(level) {
+      if (!cacheReady) {
+        setTimeout(() => initLevel(level), 50);
+        return;
+      }
+
+      currentLevel = level;
+      levelEl.textContent = level;
+      const minMoves = 5 + level;
+      minMovesEl.textContent = `Мин. ходов: ${minMoves}`;
+      
+      const progress = (level / 100) * 100;
+      progressFill.style.width = `${progress}%`;
+
+      state = LEVEL_CACHE[level].slice();
+
+      movesCount = 0;
+      movesEl.textContent = movesCount;
+      updateTimerDisplay(0);
+      if (timeInterval) clearInterval(timeInterval);
+      startTime = null;
+      gameActive = false;
+
+      render();
+    }
+
+    function render() {
+      board.innerHTML = '';
+      state.forEach((val, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = i;
+        if (val === null) {
+          cell.classList.add('empty');
+        } else {
+          cell.textContent = val;
+          cell.addEventListener('click', () => move(i));
+        }
+        board.appendChild(cell);
+      });
+      checkWin();
+    }
+
+    function move(index) {
+      const emptyIndex = state.indexOf(null);
+      const row1 = Math.floor(index / 3), col1 = index % 3;
+      const row2 = Math.floor(emptyIndex / 3), col2 = emptyIndex % 3;
+      const isAdjacent = (Math.abs(row1 - row2) + Math.abs(col1 - col2)) === 1;
+
+      if (isAdjacent) {
+        if (!gameActive) {
+          gameActive = true;
+          startTime = Date.now();
+          timeInterval = setInterval(updateTimer, 1000);
+        }
+        [state[index], state[emptyIndex]] = [state[emptyIndex], state[index]];
+        movesCount++;
+        movesEl.textContent = movesCount;
+        render();
+      }
+    }
+
+    function updateTimer() {
+      if (!startTime) return;
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      updateTimerDisplay(elapsed);
+    }
+
+    function updateTimerDisplay(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      timerEl.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function checkWin() {
+      const winState = [1, 2, 3, 4, 5, 6, 7, 8, null];
+      if (state.every((val, i) => val === winState[i])) {
+        if (timeInterval) {
+          clearInterval(timeInterval);
+          gameActive = false;
+        }
+        const finalTime = timerEl.textContent;
+        const finalMoves = movesCount;
+
+        if (currentLevel < 100) {
+          setTimeout(() => {
+            alert(`🏆 Уровень ${currentLevel} пройден!\nМин. ходов: ${5 + currentLevel} | Сделано: ${finalMoves}\nВремя: ${finalTime}`);
+            initLevel(currentLevel + 1);
+          }, 150);
+        } else {
+          setTimeout(() => {
+            alert(`🌟 ПОЗДРАВЛЯЮ, САИДЖАЪФАР! 🌟\nВы прошли ВСЕ 100 УРОВНЕЙ!\nПоследний уровень: мин. 105 ходов, сделано — ${finalMoves}\nОбщее время: ${finalTime}\nВы — чемпион логики!`);
+          }, 150);
+        }
+      }
+    }
+
+    function hint() {
+      const emptyIndex = state.indexOf(null);
+      const moves = [];
+      const row = Math.floor(emptyIndex / 3), col = emptyIndex % 3;
+      if (row > 0) moves.push(emptyIndex - 3);
+      if (row < 2) moves.push(emptyIndex + 3);
+      if (col > 0) moves.push(emptyIndex - 1);
+      if (col < 2) moves.push(emptyIndex + 1);
+      const neighbors = moves.filter(i => state[i] !== null);
+
+      if (neighbors.length > 0) {
+        const hintIndex = neighbors[Math.floor(Math.random() * neighbors.length)];
+        document.querySelectorAll('.cell').forEach(c => c.classList.remove('hinted'));
+        const cell = document.querySelector(`.cell[data-index="${hintIndex}"]`);
+        if (cell) {
+          cell.classList.add('hinted');
+          setTimeout(() => cell.classList.remove('hinted'), 2000);
+        }
+      }
+    }
+
+    hintBtn.addEventListener('click', hint);
+    setTimeout(() => initLevel(1), 100);
+  </script>
+</body>
+</html>
