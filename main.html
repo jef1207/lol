@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Камушки — 100 уровней</title>
+  <title>Камушки — 100 уровней (точная сложность)</title>
   <style>
     body {
       display: flex;
@@ -11,99 +11,94 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
       margin: 0;
-      padding: 16px;
+      padding: 20px;
       color: #333;
     }
     h1 {
-      font-size: 24px;           /* ← уменьшено */
-      font-weight: 600;          /* ← не жирный, но выразительный */
       color: #2c3e50;
-      margin: 8px 0 4px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.08);
+      margin-bottom: 5px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     .level-badge {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 22px;
+      font-weight: bold;
       background: linear-gradient(90deg, #3498db, #2c3e50);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      margin: 6px 0;
+      margin: 8px 0;
     }
     .status {
-      margin: 10px 0;
-      font-size: 16px;           /* ← чуть меньше */
-      font-weight: 500;
+      margin: 12px 0;
+      font-size: 18px;
+      font-weight: bold;
       background: #fff;
-      padding: 6px 14px;
-      border-radius: 6px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-      display: flex;
-      gap: 14px;                 /* ← элементы в одной строке с отступами */
-      align-items: center;
+      padding: 8px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
-    .status span { white-space: nowrap; }
     .board {
       display: grid;
-      grid-template-columns: repeat(3, 88px);
-      grid-template-rows: repeat(3, 88px);
-      gap: 6px;
-      margin: 16px 0;
+      grid-template-columns: repeat(3, 90px);
+      grid-template-rows: repeat(3, 90px);
+      gap: 8px;
+      margin: 20px;
     }
     .cell {
-      width: 88px;
-      height: 88px;
+      width: 90px;
+      height: 90px;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: bold;
-      border-radius: 10px;
+      border-radius: 12px;
       background: #3498db;
       color: white;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
       user-select: none;
-      transition: all 0.22s cubic-bezier(0.2, 0.8, 0.3, 1.1);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .cell:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 10px rgba(0,0,0,0.22);
+      transform: scale(1.06) rotate(2deg);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
     }
     .empty {
       background: #ecf0f1;
       cursor: default;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
     }
     .hinted {
       background: #f1c40f !important;
-      box-shadow: 0 0 12px rgba(241, 196, 15, 0.7) !important;
-      animation: pulse 1.8s infinite;
+      box-shadow: 0 0 15px rgba(241, 196, 15, 0.8) !important;
+      animation: pulse 1.5s infinite;
     }
     @keyframes pulse {
       0% { transform: scale(1); }
-      50% { transform: scale(1.06); }
+      50% { transform: scale(1.08); }
       100% { transform: scale(1); }
     }
     .controls {
-      margin: 14px 0;
+      margin: 15px 0;
     }
     button {
-      padding: 10px 18px;
-      margin: 0 6px;
-      font-size: 16px;
+      padding: 12px 20px;
+      margin: 0 8px;
+      font-size: 17px;
       font-weight: 600;
       background: linear-gradient(to right, #2980b9, #3498db);
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 3px 5px rgba(0,0,0,0.15);
-      transition: all 0.18s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s;
     }
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 7px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.2);
+      background: linear-gradient(to right, #2573a7, #2a8fcc);
     }
     button:disabled {
       background: #bdc3c7;
@@ -112,11 +107,11 @@
       box-shadow: none;
     }
     .progress-bar {
-      width: 76%;
-      height: 8px;
+      width: 80%;
+      height: 10px;
       background: #ecf0f1;
-      border-radius: 4px;
-      margin: 8px 0;
+      border-radius: 5px;
+      margin: 10px 0;
       overflow: hidden;
     }
     .progress-fill {
@@ -136,9 +131,9 @@
   </div>
 
   <div class="status">
-    <span>⏱️ <span id="timer">0:00</span></span>
-    <span>👣 <span id="moves">0</span></span>
-    <span>🎯 <span id="minMovesHint">Мин. ходов: 6</span></span>
+    Время: <span id="timer">0:00</span> | 
+    Ходы: <span id="moves">0</span> | 
+    <span id="minMovesHint" style="color: #e74c3c;">Мин. ходов: 6</span>
   </div>
 
   <div class="board" id="board"></div>
@@ -148,20 +143,22 @@
   </div>
 
   <script>
-    // === КЭШИРОВАНИЕ УРОВНЕЙ ===
-    const LEVEL_CACHE = {};
+    // === КЭШИРОВАНИЕ УРОВНЕЙ (1 раз при старте) ===
+    const LEVEL_CACHE = {}; // {1: [...], 2: [...], ...}
     let cacheReady = false;
 
     function generateAllLevels(maxLevel = 100) {
       const winState = [1, 2, 3, 4, 5, 6, 7, 8, null];
-      const queue = [[winState, 0]];
+      const queue = [[winState, 0]]; // [state, depth]
       const visited = new Map();
       visited.set(winState.join(','), 0);
-      const neededDepths = new Set(Array.from({length: maxLevel}, (_, i) => 6 + i)); // 6..105
+      const levelsToGenerate = Array.from({length: maxLevel}, (_, i) => i + 1);
+      const neededDepths = new Set(levelsToGenerate.map(l => 5 + l)); // 6..105
 
       while (queue.length && neededDepths.size > 0) {
         const [state, depth] = queue.shift();
         if (neededDepths.has(depth)) {
+          // Найти все уровни, которым нужна эта глубина
           for (let lvl = 1; lvl <= maxLevel; lvl++) {
             if (!LEVEL_CACHE[lvl] && 5 + lvl === depth) {
               LEVEL_CACHE[lvl] = state.slice();
@@ -172,13 +169,7 @@
         if (neededDepths.size === 0) break;
 
         const emptyIndex = state.indexOf(null);
-        const moves = [];
-        const row = Math.floor(emptyIndex / 3), col = emptyIndex % 3;
-        if (row > 0) moves.push(emptyIndex - 3);
-        if (row < 2) moves.push(emptyIndex + 3);
-        if (col > 0) moves.push(emptyIndex - 1);
-        if (col < 2) moves.push(emptyIndex + 1);
-
+        const moves = getValidMovesFrom(emptyIndex);
         for (const idx of moves) {
           const newState = state.slice();
           [newState[emptyIndex], newState[idx]] = [newState[idx], newState[emptyIndex]];
@@ -192,6 +183,18 @@
         }
       }
       cacheReady = true;
+      console.log(`✅ Сгенерировано ${Object.keys(LEVEL_CACHE).length} уровней`);
+    }
+
+    // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
+    function getValidMovesFrom(idx) {
+      const moves = [];
+      const row = Math.floor(idx / 3), col = idx % 3;
+      if (row > 0) moves.push(idx - 3);
+      if (row < 2) moves.push(idx + 3);
+      if (col > 0) moves.push(idx - 1);
+      if (col < 2) moves.push(idx + 1);
+      return moves;
     }
 
     // === ИНИЦИАЛИЗАЦИЯ ===
@@ -210,6 +213,7 @@
     let currentLevel = 1;
     let gameActive = false;
 
+    // Стартовая генерация (выполняется один раз)
     generateAllLevels(100);
 
     function initLevel(level) {
@@ -223,6 +227,7 @@
       const minMoves = 5 + level;
       minMovesEl.textContent = `Мин. ходов: ${minMoves}`;
       
+      // Обновляем прогресс-бар
       const progress = (level / 100) * 100;
       progressFill.style.width = `${progress}%`;
 
@@ -288,7 +293,8 @@
 
     function checkWin() {
       const winState = [1, 2, 3, 4, 5, 6, 7, 8, null];
-      if (state.every((val, i) => val === winState[i])) {
+      const isWin = state.every((val, i) => val === winState[i]);
+      if (isWin) {
         if (timeInterval) {
           clearInterval(timeInterval);
           gameActive = false;
@@ -311,26 +317,22 @@
 
     function hint() {
       const emptyIndex = state.indexOf(null);
-      const moves = [];
-      const row = Math.floor(emptyIndex / 3), col = emptyIndex % 3;
-      if (row > 0) moves.push(emptyIndex - 3);
-      if (row < 2) moves.push(emptyIndex + 3);
-      if (col > 0) moves.push(emptyIndex - 1);
-      if (col < 2) moves.push(emptyIndex + 1);
-      const neighbors = moves.filter(i => state[i] !== null);
+      const neighbors = getValidMovesFrom(emptyIndex).filter(i => state[i] !== null);
+      if (neighbors.length === 0) return;
 
-      if (neighbors.length > 0) {
-        const hintIndex = neighbors[Math.floor(Math.random() * neighbors.length)];
-        document.querySelectorAll('.cell').forEach(c => c.classList.remove('hinted'));
-        const cell = document.querySelector(`.cell[data-index="${hintIndex}"]`);
-        if (cell) {
-          cell.classList.add('hinted');
-          setTimeout(() => cell.classList.remove('hinted'), 2000);
-        }
+      const hintIndex = neighbors[Math.floor(Math.random() * neighbors.length)];
+
+      document.querySelectorAll('.cell').forEach(c => c.classList.remove('hinted'));
+      const cell = document.querySelector(`.cell[data-index="${hintIndex}"]`);
+      if (cell) {
+        cell.classList.add('hinted');
+        setTimeout(() => cell.classList.remove('hinted'), 2200);
       }
     }
 
     hintBtn.addEventListener('click', hint);
+
+    // Старт
     setTimeout(() => initLevel(1), 100);
   </script>
 </body>
